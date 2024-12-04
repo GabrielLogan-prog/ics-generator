@@ -31,6 +31,7 @@ const formSchema = z.object({
   summary: z.string().min(1, 'O título é obrigatório'),
   description: z.string().optional(),
   location: z.string().optional(),
+  meetingLink: z.string().url('O link da reunião deve ser uma URL válida').optional(),
   startDate: z.date({
     required_error: "A data de início é obrigatória",
   }),
@@ -47,6 +48,7 @@ export function ICSForm() {
       summary: '',
       description: '',
       location: '',
+      meetingLink: '',
     },
   })
 
@@ -127,6 +129,22 @@ export function ICSForm() {
               </FormControl>
               <FormDescription>
                 Onde o evento acontecerá.
+              </FormDescription>
+              <FormMessage />
+            </FormItem>
+          )}
+        />
+        <FormField
+          control={form.control}
+          name="meetingLink"
+          render={({ field }) => (
+            <FormItem>
+              <FormLabel>Link da Reunião</FormLabel>
+              <FormControl>
+                <Input placeholder="https://zoom.us/j/123456789" {...field} />
+              </FormControl>
+              <FormDescription>
+                Link para a reunião virtual (ex: Google Meet, Zoom).
               </FormDescription>
               <FormMessage />
             </FormItem>

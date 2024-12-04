@@ -2,17 +2,22 @@ import { NextResponse } from 'next/server'
 import ical from 'ical-generator'
 
 export async function POST(req: Request) {
-  const { summary, description, location, startDate, endDate } = await req.json()
+  const { summary, description, location, meetingLink, startDate, endDate } = await req.json()
 
   const calendar = ical({ name: 'Meu Calendário' })
   
-  calendar.createEvent({
+  const event = calendar.createEvent({
     start: new Date(startDate),
     end: new Date(endDate),
     summary: summary,
     description: description,
     location: location,
   })
+
+  if (meetingLink) {
+    event.url(meetingLink)
+    event.description(`${description}\n\nLink da reunião: ${meetingLink}`)
+  }
 
   const icsContent = calendar.toString()
 
@@ -23,3 +28,4 @@ export async function POST(req: Request) {
     },
   })
 }
+
