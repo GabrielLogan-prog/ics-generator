@@ -1,16 +1,17 @@
-import { NextRequest, NextResponse } from 'next/server'
+import type { NextApiRequest, NextApiResponse } from 'next'
 import ical from 'ical-generator'
 import { getEvent } from '@/lib/eventStorage'
 
-export async function GET(
-  request: NextRequest,
-  { params }: { params: { id: string } }
-) {
-  const id = params.id
-  const eventData = getEvent(id)
+export default async function handler(req: NextApiRequest, res: NextApiResponse) {
+  if (req.method !== 'GET') {
+    return res.status(405).json({ error: 'Method not allowed' })
+  }
+
+  const { id } = req.query
+  const eventData = getEvent(id as string)
 
   if (!eventData) {
-    return NextResponse.json({ error: 'Evento não encontrado' }, { status: 404 })
+    return res.status(404).json({ error: 'Evento não encontrado' })
   }
 
   const calendar = ical({ name: 'Meu Calendário' })
@@ -30,11 +31,8 @@ export async function GET(
 
   const icsContent = calendar.toString()
 
-  return new NextResponse(icsContent, {
-    headers: {
-      'Content-Type': 'text/calendar',
-      'Content-Disposition': 'attachment; filename=event.ics',
-    },
-  })
+  res.setHeader('Content-Type', 'text/calendar')
+  res.setHeader('Content-Disposition', 'attachment; filename=event.ics')
+  res.status(200).send(icsContent)
 }
 

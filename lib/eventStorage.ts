@@ -1,6 +1,6 @@
 // Simples armazenamento em memória para os eventos
 // Em uma aplicação real, você usaria um banco de dados
-const eventsStorage = new Map()
+const eventsStorage = new Map<string, any>()
 
 // Função para adicionar um evento ao armazenamento
 export function addEvent(id: string, eventData: any) {
@@ -11,3 +11,4 @@ export function addEvent(id: string, eventData: any) {
 export function getEvent(id: string) {
   return eventsStorage.get(id)
 }
+
