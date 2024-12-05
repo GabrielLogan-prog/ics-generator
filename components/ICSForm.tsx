@@ -1,9 +1,7 @@
 'use client'
 
-
-
-import { zodResolver } from '@hookform/resolvers/zod'
 import { useForm } from 'react-hook-form'
+import { zodResolver } from '@hookform/resolvers/zod'
 import * as z from 'zod'
 
 import { Button } from '@/components/ui/button'
@@ -21,7 +19,7 @@ import { Input } from '@/components/ui/input'
 import { Textarea } from '@/components/ui/textarea'
 
 const formSchema = z.object({
-  summary: z.string().min(1, 'O Título é obrigatório'),
+  summary: z.string().min(1, 'O título é obrigatório'),
   description: z.string().optional(),
   location: z.string().optional(),
   meetingLink: z.string().url('O link da reunião deve ser uma URL válida').optional(),
@@ -34,7 +32,6 @@ const formSchema = z.object({
 })
 
 export function ICSForm() {
- 
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
     defaultValues: {
@@ -56,14 +53,8 @@ export function ICSForm() {
       })
 
       if (response.ok) {
-        const blob = await response.blob()
-        const url = window.URL.createObjectURL(blob)
-        const a = document.createElement('a')
-        a.href = url
-        a.download = 'event.ics'
-        document.body.appendChild(a)
-        a.click()
-        window.URL.revokeObjectURL(url)
+        const { url } = await response.json()
+        window.open(url, '_blank')
       } else {
         console.error('Falha ao gerar o arquivo ICS')
       }

@@ -1,31 +1,21 @@
-import { NextResponse } from 'next/server'
-import ical from 'ical-generator'
+import { NextRequest, NextResponse } from 'next/server'
+import { v4 as uuidv4 } from 'uuid'
+import { addEvent } from '@/lib/eventStorage'
 
-export async function POST(req: Request) {
-  const { summary, description, location, meetingLink, startDate, endDate } = await req.json()
+export async function POST(req: NextRequest) {
+  try {
+    const eventData = await req.json()
+    const id = uuidv4()
+    
+    addEvent(id, eventData)
 
-  const calendar = ical({ name: 'Meu Calendário' })
-  
-  const event = calendar.createEvent({
-    start: new Date(startDate),
-    end: new Date(endDate),
-    summary: summary,
-    description: description,
-    location: location,
-  })
+    // Usando o protocolo 'webcal://' para compatibilidade com aplicativos de calendário
+    const url = `webcal://${req.headers.get('host')}/api/serve-ics/${id}`
 
-  if (meetingLink) {
-    event.url(meetingLink)
-    event.description(`${description}\n\nLink da reunião: ${meetingLink}`)
+    return NextResponse.json({ url })
+  } catch (error) {
+    console.error('Erro ao gerar ICS:', error)
+    return NextResponse.json({ error: 'Falha ao gerar o arquivo ICS' }, { status: 500 })
   }
-
-  const icsContent = calendar.toString()
-
-  return new NextResponse(icsContent, {
-    headers: {
-      'Content-Type': 'text/calendar',
-      'Content-Disposition': 'attachment; filename=event.ics',
-    },
-  })
 }
 
