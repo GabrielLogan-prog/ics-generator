@@ -21,7 +21,7 @@ import { Input } from '@/components/ui/input'
 import { Textarea } from '@/components/ui/textarea'
 
 const formSchema = z.object({
-  summary: z.string().min(1, 'O título é obrigatório'),
+  summary: z.string().min(1, 'O Título é obrigatório'),
   description: z.string().optional(),
   location: z.string().optional(),
   meetingLink: z.string().url('O link da reunião deve ser uma URL válida').optional(),
